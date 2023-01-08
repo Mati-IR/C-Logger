@@ -1,0 +1,14 @@
+"C:\Program Files\JetBrains\CLion 2021.3.2\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=C:/Program Files/JetBrains/CLion 2021.3.2/bin/ninja/win/ninja.exe" -G Ninja "C:\Users\Lenovo\Desktop\Studia\Systemy czasu rzeczywistego\projekt\wrapper"
+CMake Error at CMakeLists.txt:6 (add_library):
+  The target name "{CMAKE_CURRENT_SOURCE_DIR}/../lib/" is reserved or not
+  valid for certain CMake features, such as generator expressions, and may
+  result in undefined behavior.
+
+
+CMake Error at CMakeLists.txt:8 (target_link_libraries):
+  Cannot specify link libraries for target "wrapper" which is not built by
+  this project.
+
+
+-- Configuring incomplete, errors occurred!
+See also "C:/Users/Lenovo/Desktop/Studia/Systemy czasu rzeczywistego/projekt/wrapper/cmake-build-debug/CMakeFiles/CMakeOutput.log".
