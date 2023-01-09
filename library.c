@@ -11,16 +11,13 @@ int LOGGER_Init(const char * const filename_p)
     {
 #ifdef DEBUG_MODE
         /* print error information */
-        perror("LOGGER_Init\n");
+        perror("LOGGER_Init file open fail\n");
 #endif /* DEBUG_MODE */
         return LOGGER_FILE_NOT_FOUND;
     }
 
     LOGGER_LogFileName_p = malloc(strlen(filename_p) + 1);
-    for (int i = 0; i < strlen(filename_p); i++)
-    {
-        *(LOGGER_LogFileName_p + 1) = *(filename_p + i);
-    }
+    strcpy(LOGGER_LogFileName_p, filename_p);
 
     close(fd);
     return LOGGER_OK;
@@ -42,7 +39,7 @@ static int LOGGER_WriteToLogFile(priority_e priority, const char * const message
     {
 #ifdef DEBUG_MODE
         /* print error information */
-        perror("LOGGER_WriteToLogFile\n");
+        perror("LOGGER_WriteToLogFile file open fail\n");
 #endif /* DEBUG_MODE */
         retVal_u16 = LOGGER_FILE_NOT_FOUND;
     }else
@@ -51,16 +48,12 @@ static int LOGGER_WriteToLogFile(priority_e priority, const char * const message
         {
 #ifdef DEBUG_MODE
             /* print error information */
-            perror("LOGGER_Init\n");
+            perror("LOGGER_WriteToLogFile write to file fail \n");
 #endif /* DEBUG_MODE */
             retVal_u16 = LOGGER_WRITE_ERROR;
         }
         else
         {
-#ifdef DEBUG_MODE
-            /* print error information */
-            perror("LOGGER_Init\n");
-#endif /* DEBUG_MODE */
             retVal_u16 = LOGGER_OK;
         }
         close(fileDescriptor_i);
