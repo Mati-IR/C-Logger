@@ -8,8 +8,7 @@
 
 int main()
 {
-    LOGGER_Init("my_log.txt");
-    printf("%d\n", LOGGER_Init("log.txt"));
+    printf("%d\n", LOGGER_Init("my_log.txt"));
     printf("%d\n", LOGGER_Log(PRIORITY_STD, "Hello World!"));
     return 0;
 }
