@@ -9,6 +9,10 @@ int LOGGER_Init(const char * const filename_p)
     int fd = open(filename_p, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd == -1)
     {
+#ifdef DEBUG_MODE
+        /* print error information */
+        perror("LOGGER_Init\n");
+#endif /* DEBUG_MODE */
         return LOGGER_FILE_NOT_FOUND;
     }
 
@@ -36,15 +40,27 @@ static int LOGGER_WriteToLogFile(priority_e priority, const char * const message
     fileDescriptor_i = open(LOGGER_LogFileName_p, O_WRONLY | O_APPEND);
     if (-1 == fileDescriptor_i)
     {
+#ifdef DEBUG_MODE
+        /* print error information */
+        perror("LOGGER_WriteToLogFile\n");
+#endif /* DEBUG_MODE */
         retVal_u16 = LOGGER_FILE_NOT_FOUND;
     }else
     {
         if (-1 == write(fileDescriptor_i, message_p, strlen(message_p)))
         {
+#ifdef DEBUG_MODE
+            /* print error information */
+            perror("LOGGER_Init\n");
+#endif /* DEBUG_MODE */
             retVal_u16 = LOGGER_WRITE_ERROR;
         }
         else
         {
+#ifdef DEBUG_MODE
+            /* print error information */
+            perror("LOGGER_Init\n");
+#endif /* DEBUG_MODE */
             retVal_u16 = LOGGER_OK;
         }
         close(fileDescriptor_i);
