@@ -14,6 +14,7 @@ static void Conv1DigitNumberTo2DigitNumber(char * num_p)
 {
     *(num_p + 1) = *(num_p);
     *(num_p) = '0';
+*   (num_p + 2) = '\0';
 }
 
 void GetTimeStamp(char * timestamp_p)
@@ -24,14 +25,16 @@ void GetTimeStamp(char * timestamp_p)
     /* Enough memory will be allocated to each string, so that it's possible
      * to concatenate them into timestamp of format YYYY:MM:DD:HH:MM:SS
      */
-    char * year     = malloc(sizeof(char) * 4);
-    char * month    = malloc(sizeof(char) * 2);
-    char * day      = malloc(sizeof(char) * 2);
-    char * hour     = malloc(sizeof(char) * 2);
-    char * min      = malloc(sizeof(char) * 2);
-    char * sec      = malloc(sizeof(char) * 2);
+    char * year     = malloc(sizeof(char) * 5);
+    char * month    = malloc(sizeof(char) * 3);
+    char * day      = malloc(sizeof(char) * 3);
+    char * hour     = malloc(sizeof(char) * 3);
+    char * min      = malloc(sizeof(char) * 3);
+    char * sec      = malloc(sizeof(char) * 3);
 
     timeinfo        = malloc(sizeof(struct tm));
+
+    *(year + 4) = '\0';
 
 
     /* get current time */
@@ -65,7 +68,6 @@ void GetTimeStamp(char * timestamp_p)
     strcat(timestamp_p, min);
     strcat(timestamp_p, ":");
     strcat(timestamp_p, sec);
-
 
     free(year);
     free(month);

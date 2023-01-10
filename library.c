@@ -36,7 +36,6 @@ void GetLogMessage(priority_e priority, const char * const message_p, char * des
 #endif /* DEBUG_MODE */
     }else
     {
-        printf("Timestamp: %s\nMessage: %s", timestamp_p, message_p);
         switch (priority)
         {
             case PRIORITY_MIN:
@@ -60,11 +59,15 @@ void GetLogMessage(priority_e priority, const char * const message_p, char * des
                 strcat(log_message_p, message_p);
                 break;
         }
+        if(*(log_message_p + strlen(log_message_p) - 1) != '\n')
+        {
+            strcat(log_message_p, "\n\0");
+        }
     }
-    printf("Log message: %s\n", log_message_p);
+
     strcpy(destination_p, log_message_p);
     free(timestamp_p);
-    free(message_p);
+    free(log_message_p);
     return;
 }
 
