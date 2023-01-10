@@ -8,6 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "timestamp.h"
 #ifdef DEBUG_MODE
 #include <stdio.h>
 #include <errno.h>
