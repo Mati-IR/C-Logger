@@ -1,6 +1,6 @@
 #include "timestamp.h"
 
-char *my_itoa(int num, char *str)
+static char *my_itoa(int num, char *str)
 {
     if(str == NULL)
     {
@@ -10,17 +10,16 @@ char *my_itoa(int num, char *str)
     return str;
 }
 
-void LOGGER_1DigitNumberTo2DigitNumber(char * num_p)
+static void Conv1DigitNumberTo2DigitNumber(char * num_p)
 {
     *(num_p + 1) = *(num_p);
     *(num_p) = '0';
 }
 
-void LOGGER_GetTimeStamp(char * timestamp_p)
+void GetTimeStamp(char * timestamp_p)
 {
     time_t rawtime;
     struct tm * timeinfo;
-    char buffer[80];
 
     /* Enough memory will be allocated to each string, so that it's possible
      * to concatenate them into timestamp of format YYYY:MM:DD:HH:MM:SS
@@ -38,7 +37,6 @@ void LOGGER_GetTimeStamp(char * timestamp_p)
     /* get current time */
     time(&rawtime);
     timeinfo = localtime ( &rawtime );
-    asctime_r(localtime(&rawtime), buffer);
 
     /* write time to strings */
     my_itoa((timeinfo->tm_year + TM_YEAR_OFFSET), year);
@@ -49,11 +47,11 @@ void LOGGER_GetTimeStamp(char * timestamp_p)
     my_itoa((timeinfo->tm_sec), sec);
 
     /* standardize timestamp elements' lengths */
-    if(timeinfo->tm_mon < 10)  {LOGGER_1DigitNumberTo2DigitNumber(month);}
-    if(timeinfo->tm_mday < 10) {LOGGER_1DigitNumberTo2DigitNumber(day);}
-    if(timeinfo->tm_hour < 10) {LOGGER_1DigitNumberTo2DigitNumber(hour);}
-    if(timeinfo->tm_min < 10)  {LOGGER_1DigitNumberTo2DigitNumber(min);}
-    if(timeinfo->tm_sec < 10)  {LOGGER_1DigitNumberTo2DigitNumber(sec);}
+    if(timeinfo->tm_mon < 10)  {Conv1DigitNumberTo2DigitNumber(month);}
+    if(timeinfo->tm_mday < 10) {Conv1DigitNumberTo2DigitNumber(day);}
+    if(timeinfo->tm_hour < 10) {Conv1DigitNumberTo2DigitNumber(hour);}
+    if(timeinfo->tm_min < 10)  {Conv1DigitNumberTo2DigitNumber(min);}
+    if(timeinfo->tm_sec < 10)  {Conv1DigitNumberTo2DigitNumber(sec);}
 
     /* concatenate timestamp elements into one string */
     strcpy(timestamp_p, day);
