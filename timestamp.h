@@ -10,6 +10,8 @@
 #define TM_YEAR_OFFSET (1900U)
 #define TM_MONTH_OFFSET (1U)
 
+#define TIMESTAMP_LENGTH (19U)
+
 extern void GetTimeStamp(char * timestamp_p);
 
 #endif //WRAPPER_TIMESTAMP_H

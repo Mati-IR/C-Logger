@@ -15,12 +15,53 @@ int LOGGER_Init(const char * const filename_p)
 #endif /* DEBUG_MODE */
         return LOGGER_FILE_NOT_FOUND;
     }
-    
+
     LOGGER_LogFileName_p = malloc(strlen(filename_p) + 1); /* one additional byte for null terminator */
     strcpy(LOGGER_LogFileName_p, filename_p);
 
     close(fd);
     return LOGGER_OK;
+}
+
+char * GetLogMessage(priority_e priority, const char * const message_p)
+{
+    char *log_message_p = malloc(MAX_MESSAGE_LENGTH + 1); /* one additional byte for null terminator */
+    char *timestamp_p = malloc(sizeof(char) * (TIMESTAMP_LENGTH + 1)); /* one additional byte for null terminator */
+    GetTimeStamp(timestamp_p);
+    if (log_message_p == NULL || timestamp_p == NULL)
+    {
+#ifdef DEBUG_MODE
+        /* print error information */
+        perror("GetLogMessage malloc fail\n");
+#endif /* DEBUG_MODE */
+    }else
+    {
+        switch (priority)
+        {
+            case PRIORITY_MIN:
+                strcpy(log_message_p, timestamp_p);
+                strcat(log_message_p, " MIN: ");
+                strcat(log_message_p, message_p);
+                break;
+            case PRIORITY_STD:
+                strcpy(log_message_p, timestamp_p);
+                strcat(log_message_p, " STD: ");
+                strcat(log_message_p, message_p);
+                break;
+            case PRIORITY_MAX:
+                strcpy(log_message_p, timestamp_p);
+                strcat(log_message_p, " MAX: ");
+                strcat(log_message_p, message_p);
+                break;
+            default:
+                strcpy(log_message_p, timestamp_p);
+                strcat(log_message_p, " ERR: ");
+                strcat(log_message_p, message_p);
+                break;
+        }
+    }
+    return log_message_p;
+
 }
 
 /*
@@ -32,7 +73,8 @@ static int LOGGER_WriteToLogFile(priority_e priority, const char * const message
 {
     unsigned int retVal_u16           = LOGGER_ERROR;
     int          fileDescriptor_i     = -1;
-    /* write to logFile_p using posix write() function */
+    char        *log_message_p        = malloc(MAX_MESSAGE_LENGTH + 1); /* one additional byte for null terminator */
+
 
     fileDescriptor_i = open(LOGGER_LogFileName_p, O_WRONLY | O_APPEND);
     if (-1 == fileDescriptor_i)
@@ -44,7 +86,8 @@ static int LOGGER_WriteToLogFile(priority_e priority, const char * const message
         retVal_u16 = LOGGER_FILE_NOT_FOUND;
     }else
     {
-        if (-1 == write(fileDescriptor_i, message_p, strlen(message_p)))
+        log_message_p = GetLogMessage(priority, message_p);
+        if (-1 == write(fileDescriptor_i, log_message_p, strlen(message_p)))
         {
 #ifdef DEBUG_MODE
             /* print error information */
