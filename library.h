@@ -1,12 +1,22 @@
 #ifndef LIB_LIBRARY_H
 #define LIB_LIBRARY_H
 
+/* If debug mode is defined, program will print out errno, but will no longer be signal atomic */
+#define DEBUG_MODE
+
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "timestamp.h"
+#ifdef DEBUG_MODE
+#include <stdio.h>
+#include <errno.h>
+#endif /* DEBUG_MODE */
+
 
 #define MAX_MESSAGE_LENGTH          (1000U)
+#define LOG_FILE_PERMISSIONS        (0644)
 #define LOGGER_OK                   (0U)
 #define LOGGER_ERROR                (1U)
 #define LOGGER_NULL_ARG_MESSAGE_PTR (2U)

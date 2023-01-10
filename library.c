@@ -6,20 +6,69 @@ char * LOGGER_LogFileName_p;
 
 int LOGGER_Init(const char * const filename_p)
 {
-    int fd = open(filename_p, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    int fd = open(filename_p, O_WRONLY | O_CREAT | O_TRUNC, LOG_FILE_PERMISSIONS);
     if (fd == -1)
     {
+#ifdef DEBUG_MODE
+        /* print error information */
+        perror("LOGGER_Init file open fail\n");
+#endif /* DEBUG_MODE */
         return LOGGER_FILE_NOT_FOUND;
     }
 
-    LOGGER_LogFileName_p = malloc(strlen(filename_p) + 1);
-    for (int i = 0; i < strlen(filename_p); i++)
-    {
-        *(LOGGER_LogFileName_p + 1) = *(filename_p + i);
-    }
+    LOGGER_LogFileName_p = malloc(strlen(filename_p) + 1); /* one additional byte for null terminator */
+    strcpy(LOGGER_LogFileName_p, filename_p);
 
     close(fd);
     return LOGGER_OK;
+}
+
+void GetLogMessage(priority_e priority, const char * const message_p, char * destination_p)
+{
+    char *log_message_p = malloc(MAX_MESSAGE_LENGTH + 1); /* one additional byte for null terminator */
+    char *timestamp_p = malloc(sizeof(char) * (TIMESTAMP_LENGTH + 1)); /* one additional byte for null terminator */
+    GetTimeStamp(timestamp_p);
+    if ((log_message_p == NULL) || (timestamp_p == NULL) || (destination_p == NULL))
+    {
+#ifdef DEBUG_MODE
+        /* print error information */
+        perror("GetLogMessage malloc fail\n");
+#endif /* DEBUG_MODE */
+    }else
+    {
+        switch (priority)
+        {
+            case PRIORITY_MIN:
+                strcpy(log_message_p, timestamp_p);
+                strcat(log_message_p, " MIN: ");
+                strcat(log_message_p, message_p);
+                break;
+            case PRIORITY_STD:
+                strcpy(log_message_p, timestamp_p);
+                strcat(log_message_p, " STD: ");
+                strcat(log_message_p, message_p);
+                break;
+            case PRIORITY_MAX:
+                strcpy(log_message_p, timestamp_p);
+                strcat(log_message_p, " MAX: ");
+                strcat(log_message_p, message_p);
+                break;
+            default:
+                strcpy(log_message_p, timestamp_p);
+                strcat(log_message_p, " ERR: ");
+                strcat(log_message_p, message_p);
+                break;
+        }
+        if(*(log_message_p + strlen(log_message_p) - 1) != '\n')
+        {
+            strcat(log_message_p, "\n\0");
+        }
+    }
+
+    strcpy(destination_p, log_message_p);
+    free(timestamp_p);
+    free(log_message_p);
+    return;
 }
 
 /*
@@ -31,16 +80,26 @@ static int LOGGER_WriteToLogFile(priority_e priority, const char * const message
 {
     unsigned int retVal_u16           = LOGGER_ERROR;
     int          fileDescriptor_i     = -1;
-    /* write to logFile_p using posix write() function */
+    char        *log_message_p        = malloc(MAX_MESSAGE_LENGTH + 1); /* one additional byte for null terminator */
+
 
     fileDescriptor_i = open(LOGGER_LogFileName_p, O_WRONLY | O_APPEND);
     if (-1 == fileDescriptor_i)
     {
+#ifdef DEBUG_MODE
+        /* print error information */
+        perror("LOGGER_WriteToLogFile file open fail\n");
+#endif /* DEBUG_MODE */
         retVal_u16 = LOGGER_FILE_NOT_FOUND;
     }else
     {
-        if (-1 == write(fileDescriptor_i, message_p, strlen(message_p)))
+        GetLogMessage(priority, message_p, log_message_p);
+        if (-1 == write(fileDescriptor_i, log_message_p, strlen(log_message_p)))
         {
+#ifdef DEBUG_MODE
+            /* print error information */
+            perror("LOGGER_WriteToLogFile write to file fail \n");
+#endif /* DEBUG_MODE */
             retVal_u16 = LOGGER_WRITE_ERROR;
         }
         else
