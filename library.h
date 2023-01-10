@@ -16,6 +16,7 @@
 
 
 #define MAX_MESSAGE_LENGTH          (1000U)
+#define LOG_FILE_PERMISSIONS        (0644)
 #define LOGGER_OK                   (0U)
 #define LOGGER_ERROR                (1U)
 #define LOGGER_NULL_ARG_MESSAGE_PTR (2U)

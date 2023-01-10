@@ -6,7 +6,7 @@ char * LOGGER_LogFileName_p;
 
 int LOGGER_Init(const char * const filename_p)
 {
-    int fd = open(filename_p, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    int fd = open(filename_p, O_WRONLY | O_CREAT | O_TRUNC, LOG_FILE_PERMISSIONS);
     if (fd == -1)
     {
 #ifdef DEBUG_MODE
@@ -15,8 +15,8 @@ int LOGGER_Init(const char * const filename_p)
 #endif /* DEBUG_MODE */
         return LOGGER_FILE_NOT_FOUND;
     }
-
-    LOGGER_LogFileName_p = malloc(strlen(filename_p) + 1);
+    
+    LOGGER_LogFileName_p = malloc(strlen(filename_p) + 1); /* one additional byte for null terminator */
     strcpy(LOGGER_LogFileName_p, filename_p);
 
     close(fd);
