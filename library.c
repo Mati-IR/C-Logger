@@ -23,12 +23,12 @@ int LOGGER_Init(const char * const filename_p)
     return LOGGER_OK;
 }
 
-char * GetLogMessage(priority_e priority, const char * const message_p)
+void GetLogMessage(priority_e priority, const char * const message_p, char * destination_p)
 {
     char *log_message_p = malloc(MAX_MESSAGE_LENGTH + 1); /* one additional byte for null terminator */
     char *timestamp_p = malloc(sizeof(char) * (TIMESTAMP_LENGTH + 1)); /* one additional byte for null terminator */
     GetTimeStamp(timestamp_p);
-    if (log_message_p == NULL || timestamp_p == NULL)
+    if ((log_message_p == NULL) || (timestamp_p == NULL) || (destination_p == NULL))
     {
 #ifdef DEBUG_MODE
         /* print error information */
@@ -36,6 +36,7 @@ char * GetLogMessage(priority_e priority, const char * const message_p)
 #endif /* DEBUG_MODE */
     }else
     {
+        printf("Timestamp: %s\nMessage: %s", timestamp_p, message_p);
         switch (priority)
         {
             case PRIORITY_MIN:
@@ -60,8 +61,11 @@ char * GetLogMessage(priority_e priority, const char * const message_p)
                 break;
         }
     }
-    return log_message_p;
-
+    printf("Log message: %s\n", log_message_p);
+    strcpy(destination_p, log_message_p);
+    free(timestamp_p);
+    free(message_p);
+    return;
 }
 
 /*
@@ -86,8 +90,8 @@ static int LOGGER_WriteToLogFile(priority_e priority, const char * const message
         retVal_u16 = LOGGER_FILE_NOT_FOUND;
     }else
     {
-        log_message_p = GetLogMessage(priority, message_p);
-        if (-1 == write(fileDescriptor_i, log_message_p, strlen(message_p)))
+        GetLogMessage(priority, message_p, log_message_p);
+        if (-1 == write(fileDescriptor_i, log_message_p, strlen(log_message_p)))
         {
 #ifdef DEBUG_MODE
             /* print error information */
