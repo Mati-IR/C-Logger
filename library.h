@@ -36,5 +36,8 @@ typedef enum
 extern int Log(priority_e priority, const char * const message_p);
 extern int Logger_Init(const char * const filename_p);
 
+/* Set priority of logger, default priority value is PRIORITY_MAX  */
+extern int Logger_SetPriority(priority_e priority);
+
 
 #endif //LIB_LIBRARY_H

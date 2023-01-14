@@ -141,3 +141,8 @@ int Log(priority_e priority, const char * const message_p)
 {
     return LOGGER_Log(priority, message_p);
 }
+
+int Logger_SetPriority(priority_e priority)
+{
+    LOGGER_LogPriority = priority;
+}
