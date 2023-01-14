@@ -24,6 +24,7 @@
 #define LOGGER_FILE_NOT_FOUND       (4U)
 #define LOGGER_WRITE_ERROR          (5U)
 #define LOGGER_MEM_ALLOC_ERROR      (6U)
+#define LOGGER_TOO_LOW_PRIORITY     (7U)
 
 typedef enum
 {
@@ -32,8 +33,8 @@ typedef enum
     PRIORITY_MAX = 2
 } priority_e;
 
-extern int LOGGER_Log(priority_e priority, const char * const message_p);
-extern int LOGGER_Init(const char * const filename_p);
+extern int Log(priority_e priority, const char * const message_p);
+extern int Logger_Init(const char * const filename_p);
 
 
 #endif //LIB_LIBRARY_H

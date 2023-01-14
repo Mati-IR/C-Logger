@@ -2,16 +2,17 @@
 
 
 char * LOGGER_LogFileName_p;
+priority_e LOGGER_LogPriority = PRIORITY_MAX;
 
 
-int LOGGER_Init(const char * const filename_p)
+int Logger_Init(const char * const filename_p)
 {
     int fd = open(filename_p, O_WRONLY | O_CREAT | O_TRUNC, LOG_FILE_PERMISSIONS);
     if (fd == -1)
     {
 #ifdef DEBUG_MODE
         /* print error information */
-        perror("LOGGER_Init file open fail\n");
+        perror("Logger_Init file open fail\n");
 #endif /* DEBUG_MODE */
         return LOGGER_FILE_NOT_FOUND;
     }
@@ -23,7 +24,7 @@ int LOGGER_Init(const char * const filename_p)
     return LOGGER_OK;
 }
 
-void GetLogMessage(priority_e priority, const char * const message_p, char * destination_p)
+static void GetLogMessage(priority_e priority, const char * const message_p, char * destination_p)
 {
     char *log_message_p = malloc(MAX_MESSAGE_LENGTH + 1); /* one additional byte for null terminator */
     char *timestamp_p = malloc(sizeof(char) * (TIMESTAMP_LENGTH + 1)); /* one additional byte for null terminator */
@@ -112,11 +113,15 @@ static int LOGGER_WriteToLogFile(priority_e priority, const char * const message
     return retVal_u16;
 }
 
-int LOGGER_Log(priority_e priority, const char * const message_p)
+static int LOGGER_Log(priority_e priority, const char * const message_p)
 {
     unsigned int retVal_u16 = LOGGER_ERROR;
 
-    if(NULL == message_p)
+    if(priority > LOGGER_LogPriority)
+    {
+        return LOGGER_TOO_LOW_PRIORITY;
+    }
+    else if(NULL == message_p)
     {
         retVal_u16 = LOGGER_NULL_ARG_MESSAGE_PTR;
     }
@@ -130,4 +135,9 @@ int LOGGER_Log(priority_e priority, const char * const message_p)
     }
 
     return retVal_u16;
+}
+
+int Log(priority_e priority, const char * const message_p)
+{
+    return LOGGER_Log(priority, message_p);
 }
