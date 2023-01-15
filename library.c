@@ -4,17 +4,17 @@
 char * LOGGER_LogFileName_p;
 priority_e LOGGER_LogPriority = PRIORITY_MAX;
 
-static void MinPrioritySigHandler(void)
+void* MinPrioritySigHandler(int signo)
 {
     LOGGER_LogPriority = PRIORITY_MIN;
 }
 
-static void StdPrioritySigHandler(void)
+void* StdPrioritySigHandler(int signo)
 {
     LOGGER_LogPriority = PRIORITY_STD;
 }
 
-static void MaxPrioritySigHandler(void)
+void* MaxPrioritySigHandler(int signo)
 {
     LOGGER_LogPriority = PRIORITY_MAX;
 }
@@ -29,9 +29,9 @@ static void SignalHandlingRoutine(void)
     stdPrioritySignalAction.sa_sigaction = StdPrioritySigHandler;
     maxPrioritySignalAction.sa_sigaction = MaxPrioritySigHandler;
 
-    sigfillset(minPrioritySignalAction.sa_mask);
-    sigfillset(stdPrioritySignalAction.sa_mask);
-    sigfillset(maxPrioritySignalAction.sa_mask);
+    sigfillset(&minPrioritySignalAction.sa_mask);
+    sigfillset(&stdPrioritySignalAction.sa_mask);
+    sigfillset(&maxPrioritySignalAction.sa_mask);
 
     minPrioritySignalAction.sa_flags = MIN_PRIORITY_FLAG;
     stdPrioritySignalAction.sa_flags = STD_PRIORITY_FLAG;
@@ -58,6 +58,8 @@ int Logger_Init(const char * const filename_p)
     {
         loggerInitialized_u = 1;
     }
+
+    pthread_t tid;
     int fd = open(filename_p, O_WRONLY | O_CREAT | O_TRUNC, LOG_FILE_PERMISSIONS);
     if (fd == -1)
     {
@@ -71,7 +73,7 @@ int Logger_Init(const char * const filename_p)
     LOGGER_LogFileName_p = malloc(strlen(filename_p) + 1); /* one additional byte for null terminator */
     strcpy(LOGGER_LogFileName_p, filename_p);
 
-    if (0 != pthread_create(NULL, NULL, SignalHandlingRoutine, NULL))
+    if (0 != pthread_create(&tid, NULL, SignalHandlingRoutine, NULL))
     {
 #ifdef DEBUG_MODE
         /* print error information */
