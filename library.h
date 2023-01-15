@@ -8,6 +8,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <pthread.h>
 #include "timestamp.h"
 #ifdef DEBUG_MODE
 #include <stdio.h>
@@ -25,6 +27,13 @@
 #define LOGGER_WRITE_ERROR          (5U)
 #define LOGGER_MEM_ALLOC_ERROR      (6U)
 #define LOGGER_TOO_LOW_PRIORITY     (7U)
+#define LOGGER_REINITIALIZATION     (8U)
+#define LOGGER_PTHREAD_ERROR        (9U)
+
+
+#define MIN_PRIORITY_FLAG SIGUSR1
+#define STD_PRIORITY_FLAG SIGUSR2
+#define MAX_PRIORITY_FLAG SIGWINCH
 
 typedef enum
 {

@@ -4,9 +4,60 @@
 char * LOGGER_LogFileName_p;
 priority_e LOGGER_LogPriority = PRIORITY_MAX;
 
+static void MinPrioritySigHandler(void)
+{
+    LOGGER_LogPriority = PRIORITY_MIN;
+}
+
+static void StdPrioritySigHandler(void)
+{
+    LOGGER_LogPriority = PRIORITY_STD;
+}
+
+static void MaxPrioritySigHandler(void)
+{
+    LOGGER_LogPriority = PRIORITY_MAX;
+}
+
+static void SignalHandlingRoutine(void)
+{
+    struct sigaction minPrioritySignalAction;
+    struct sigaction stdPrioritySignalAction;
+    struct sigaction maxPrioritySignalAction;
+
+    minPrioritySignalAction.sa_sigaction = MinPrioritySigHandler;
+    stdPrioritySignalAction.sa_sigaction = StdPrioritySigHandler;
+    maxPrioritySignalAction.sa_sigaction = MaxPrioritySigHandler;
+
+    sigfillset(minPrioritySignalAction.sa_mask);
+    sigfillset(stdPrioritySignalAction.sa_mask);
+    sigfillset(maxPrioritySignalAction.sa_mask);
+
+    minPrioritySignalAction.sa_flags = MIN_PRIORITY_FLAG;
+    stdPrioritySignalAction.sa_flags = STD_PRIORITY_FLAG;
+    maxPrioritySignalAction.sa_flags = MAX_PRIORITY_FLAG;
+
+    sigaction(MIN_PRIORITY_FLAG, &minPrioritySignalAction, NULL);
+    sigaction(STD_PRIORITY_FLAG, &stdPrioritySignalAction, NULL);
+    sigaction(MAX_PRIORITY_FLAG, &maxPrioritySignalAction, NULL);
+
+    while(1)
+    {
+
+    }
+}
 
 int Logger_Init(const char * const filename_p)
 {
+    static unsigned int loggerInitialized_u = 0;
+    if (1 == loggerInitialized_u)
+    {
+        return LOGGER_REINITIALIZATION;
+    }
+    else
+    {
+        loggerInitialized_u = 1;
+    }
     int fd = open(filename_p, O_WRONLY | O_CREAT | O_TRUNC, LOG_FILE_PERMISSIONS);
     if (fd == -1)
     {
@@ -19,6 +70,15 @@ int Logger_Init(const char * const filename_p)
 
     LOGGER_LogFileName_p = malloc(strlen(filename_p) + 1); /* one additional byte for null terminator */
     strcpy(LOGGER_LogFileName_p, filename_p);
+
+    if (0 != pthread_create(NULL, NULL, SignalHandlingRoutine, NULL))
+    {
+#ifdef DEBUG_MODE
+        /* print error information */
+        perror("Logger_Init pthread_create fail\n");
+#endif /* DEBUG_MODE */
+        return LOGGER_PTHREAD_ERROR;
+    }
 
     close(fd);
     return LOGGER_OK;
